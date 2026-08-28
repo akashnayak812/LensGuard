@@ -38,15 +38,15 @@ jobs:
           pip install opencv-python-headless numpy scipy PyWavelets scikit-learn
 
       - name: Run backend tests
-        working-directory: backend
         env:
+          PYTHONPATH: "."
           DB_PATH: ":memory:"
-          MODEL_PATH: "../ml/models"
+          MODEL_PATH: "ml/models"
           MODEL_VERSION: "v1"
           UPLOAD_DIR: "/tmp/uploads"
           HEATMAP_DIR: "/tmp/heatmaps"
         run: |
-          python -m pytest tests/ -v --tb=short -x
+          python -m pytest backend/tests/ -v --tb=short
 
   # ── Frontend tests ─────────────────────────────────────────────────────────
   frontend-tests:

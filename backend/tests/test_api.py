@@ -18,8 +18,13 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-# Ensure project root is on path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+# Ensure backend and project root are on sys.path
+_TEST_DIR = Path(__file__).resolve().parent
+_BACKEND_DIR = _TEST_DIR.parent
+_PROJECT_ROOT = _BACKEND_DIR.parent
+for _p in (str(_BACKEND_DIR), str(_PROJECT_ROOT)):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
 # ── Mock ML modules before importing the app ─────────────────────────────
 # This prevents TensorFlow from loading during CI test runs.
@@ -74,12 +79,18 @@ def client():
         from app.main import app
         from app.database import init_db, engine, Base
 
-        # Use in-memory SQLite for tests
+        # Use in-memory SQLite with StaticPool so schema persists across sessions
         from sqlalchemy import create_engine
         from sqlalchemy.orm import sessionmaker
+        from sqlalchemy.pool import StaticPool
         from app import database
+        from app.models import Analysis
 
-        test_engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
+        test_engine = create_engine(
+            "sqlite:///:memory:",
+            connect_args={"check_same_thread": False},
+            poolclass=StaticPool,
+        )
         Base.metadata.create_all(bind=test_engine)
         TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
 
