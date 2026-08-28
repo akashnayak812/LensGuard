@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: theme('colors.surface.900');
+  }
+  ::-webkit-scrollbar-thumb {
+    background: theme('colors.surface.300');
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: theme('colors.brand.500');
+  }
+}
+
+@layer components {
+  /* Glass card */
+  .glass-card {
+    @apply bg-white dark:bg-surface-800/60 backdrop-blur-md border border-slate-200/80 dark:border-white/5 rounded-2xl shadow-sm dark:shadow-none transition-colors duration-150;
+  }
+
+  /* Primary button */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium
+           bg-brand-600 hover:bg-brand-500 active:bg-brand-700
+           text-white transition-all duration-150
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400
+           disabled:opacity-50 disabled:cursor-not-allowed shadow-sm;
+  }
+
+  /* Ghost button */
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-xl font-medium
+           text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-white/5
+           transition-all duration-150
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400;
+  }
+
+  /* Severity badge */
+  .badge-low      { @apply bg-success-500/15 text-success-400 border border-success-500/20; }
+  .badge-medium   { @apply bg-warning-500/15 text-warning-400 border border-warning-500/20; }
+  .badge-high     { @apply bg-danger-500/15  text-danger-400  border border-danger-500/20; }
+
+  /* Score colour by label */
+  .score-acceptable { @apply text-success-400; }
+  .score-degraded   { @apply text-warning-400; }
+  .score-defective  { @apply text-danger-400; }
+
+  /* Skeleton shimmer */
+  .skeleton {
+    @apply bg-surface-800 animate-pulse rounded-lg;
+  }
+
+  /* Input */
+  .input-field {
+    @apply w-full px-4 py-2.5 rounded-xl bg-surface-900/80 border border-white/10
+           text-slate-200 placeholder-slate-500
+           focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent
+           transition-all duration-150;
+  }
+}
+
+/* Progress bar animation */
+@keyframes progress-fill {
+  from { width: 0%; }
+}
+
+.progress-bar-animate {
+  animation: progress-fill 0.6s ease-out forwards;
+}
+
+/* SVG gauge animation */
+@keyframes gauge-draw {
+  from { stroke-dashoffset: 314; }
+}
+
+.gauge-arc-animate {
+  animation: gauge-draw 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}

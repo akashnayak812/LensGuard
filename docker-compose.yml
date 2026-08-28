@@ -1,0 +1,67 @@
+name: lensguard
+
+services:
+  # ── Backend ───────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: lensguard-backend
+    restart: unless-stopped
+    environment:
+      DB_PATH: ${DB_PATH:-/app/data/lensguard.db}
+      MODEL_PATH: ${MODEL_PATH:-/app/ml/models}
+      MODEL_VERSION: ${MODEL_VERSION:-v1}
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-20}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost,http://localhost:80}
+      UPLOAD_DIR: ${UPLOAD_DIR:-/app/data/uploads}
+      HEATMAP_DIR: ${HEATMAP_DIR:-/app/data/heatmaps}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      HOST: 0.0.0.0
+      PORT: 8000
+    volumes:
+      # Named volume — data persists across restarts
+      - lensguard_data:/app/data
+    networks:
+      - lensguard_net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 90s
+      retries: 5
+    # Expose backend port for direct API access during development
+    ports:
+      - "8000:8000"
+
+  # ── Frontend ──────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+      args:
+        VITE_API_BASE_URL: ""   # empty = relative URLs through nginx proxy
+    container_name: lensguard-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    networks:
+      - lensguard_net
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+volumes:
+  # SQLite DB + uploads + heatmaps persist here
+  lensguard_data:
+    driver: local
+
+networks:
+  lensguard_net:
+    driver: bridge

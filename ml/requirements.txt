@@ -1,0 +1,9 @@
+tensorflow==2.16.1
+keras==3.3.3
+opencv-python-headless==4.9.0.80
+numpy==1.26.4
+scipy==1.13.1
+scikit-learn==1.5.0
+Pillow==10.3.0
+matplotlib==3.9.0
+PyWavelets==1.6.0
